@@ -1,7 +1,13 @@
 <?php
 session_start();
 
-$conn = mysqli_connect('127.0.1.31','root','','project',3306);
+$host = '127.0.1.31';
+$port = 3306;
+$user = 'root';
+$password = ''; 
+$database = 'project';
+
+$conn = mysqli_connect($host, $user, $password, $database, $port);
 
 $query = "SELECT * FROM Disease";
 $result = mysqli_query($conn, $query);
@@ -44,21 +50,18 @@ if ($selected) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Энциклопедия о заболеваниях</title>
+
+
+    <link rel="stylesheet" href="/Style/Global_css/fonts.css">
     <link rel="stylesheet" href="/Style/Components/header.css">
     <link rel="stylesheet" href="/Style/Layouts/main.css">
-    
-    <script src="/Scripts/header.js"></script>
+    <script>window.isAuth = <?= isset($_SESSION["auth"]) && $_SESSION["auth"] === true ? 'true' : 'false' ?>;</script>
+    <script src="/Style/Components/header.js"></script>
     </head>
 <body>
 
-    <my-header></my-header>
-        <div class="cont">
-
-    <div class="container">
-        <button class="btn" onclick="window.location.href='register.php'">Зарегистрироваться</button>
-    </div>
-
-
+    <my-header-main></my-header-main>
+    <div class="cont">
     <form method="GET">
         <?php foreach ($category_map as $cat_id => $cat_name): ?>
             <label><?= $cat_name ?></label>
@@ -75,23 +78,22 @@ if ($selected) {
             <br><br>
         <?php endforeach; ?>
     </form>
+    <div class="container">
+        <button class="btn" onclick="window.location.href='appointment.php'">Записаться к врачу</button>
+    </div>
 </div>
-
     <div class="right">
-    <?php if($selected_disease): ?>
-        <div class="card">
+    <div class="card">
+        <?php if($selected_disease): ?>
             <h3><?=$selected_disease['Disease_name']?></h3>
             <p><?=$selected_disease['Disease_description']?></p>
             <p><b>Симптомы:</b> <?=$selected_disease['Disease_symptoms']?></p>
             <p><b>Причина:</b> <?=$selected_disease['Disease_cause']?></p>
-        </div>
-    <?php else: ?>
-        <p>Выберите заболевание из списка</p>
-    <?php endif; ?>
+        <?php else: ?>
+        <?php endif; ?>
+    </div>
 </div>
-
 </div>
-
 </div>
-
+</div>
 </body>

@@ -1,16 +1,20 @@
+
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
+
 .wrapper {
     display: flex;
+    justify-content: center; 
+    align-items: flex-start;
     width: 100%;
     min-height: 100vh;
+    gap: 40px;
+    padding: 40px;
 }
-
 body{
-    
     background-color: rgb(137, 139, 255);
    
 }
@@ -21,12 +25,9 @@ body{
     padding-bottom: 150px;
 }
 
-.cont{
+.cont {
     flex: 1;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    max-width: 500px;
 }
 
 .box{
@@ -55,17 +56,22 @@ body{
 }
 
 .right {
-    width: 400px;
-    margin-left: auto;
+    width: 500px; 
+    height: 900px;
     padding: 20px;
     display: flex;
-    flex-direction: column;
-    justify-content: center; 
+    justify-content: center;
+    align-items: center;
+    margin-left: 0; 
 }
 
 
 .card {
+    width: 100%; 
+    height: 100%;
+    max-width: 500px;
     background: #68F5FF;
-    padding: 15px;
-    border-radius: 10px;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
 }

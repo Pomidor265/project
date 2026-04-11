@@ -1,0 +1,15 @@
+@font-face {
+font-family: '5ka Sans Design';
+src: url('/Style/Fonts/5ka_Sans_Design/5KASANSDESIGN-REGULAR.8DECC07DF8894152.ttf') format('truetype');
+font-weight: 400;
+font-style: normal;
+font-display: swap;
+}
+
+body {
+    font-family: '5ka Sans Design', sans-serif;
+}
+.btn{
+  
+    font-family: '5ka Sans Design', sans-serif; 
+}

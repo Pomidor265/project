@@ -1,4 +1,11 @@
-my-header{
+.header{
+    background: #30B7D5;
+    align-items: center;
+    height: 80px;
+    width: 100%;
+    display: flex;
+}
+.header.my-header{
     background: #30B7D5;
     align-items: center;
     height: 80px;
@@ -6,7 +13,7 @@ my-header{
     display: flex;
 }
 
-my-header-main{
+.header.my-header-main{
     background: #30B7D5;
     align-items: center;
     height: 80px;
@@ -22,9 +29,9 @@ my-header-main{
 
 .logo-img {
    display: flex;
-   
-
 }
+
+
 .logo-img img{
     width: 100px;
     height: 100px;
@@ -32,4 +39,37 @@ my-header-main{
     max-width: 30px;
     max-height: 30px;
     padding-right: 5px;
+}
+
+.avatar {
+    margin-left: auto;
+    cursor: pointer;
+}
+
+.avatar img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+.right-block {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn{
+    width: 300px;
+    height: 60px;
+    background-color: #30D5C8;
+    display: flex;
+    justify-content:center;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn:hover{
+    background-color: #33F8E8;
 }
