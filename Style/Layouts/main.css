@@ -7,13 +7,13 @@
 
 .wrapper {
     display: flex;
-    justify-content: center; 
-    align-items: flex-start;
+    justify-content: space-between; 
     width: 100%;
     min-height: 100vh;
-    gap: 40px;
     padding: 40px;
+    gap: 40px;
 }
+
 body{
     background-color: rgb(137, 139, 255);
    
@@ -26,10 +26,8 @@ body{
 }
 
 .cont {
-    flex: 1;
-    max-width: 500px;
+    flex: 0 0 400px; 
 }
-
 .box{
     width: 300px;
     height: 60px;
@@ -56,22 +54,40 @@ body{
 }
 
 .right {
-    width: 500px; 
-    height: 900px;
-    padding: 20px;
+    flex: 1;
     display: flex;
     justify-content: center;
-    align-items: center;
-    margin-left: 0; 
+    
+    margin-left: auto;
 }
 
 
 .card {
-    width: 100%; 
-    height: 100%;
-    max-width: 500px;
+    width: 800px;       
+    height: 500px;  
     background: #68F5FF;
     padding: 25px;
     border-radius: 12px;
     text-align: center;
+    
+}
+
+.cont select {
+    width: 300px;
+    height: 50px;
+    background-color: #93FBFF;
+    border: none;
+    padding: 0 12px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.cont select option {
+    background: white;
+    color: black;
 }

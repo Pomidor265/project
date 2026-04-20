@@ -16,15 +16,15 @@ body {
 .form-wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 830px;
-    
+    align-items: flex-start;
+    gap: 30px; 
 }
 
 .fields {
     display: flex;
     flex-direction: column;
 }
+
 .page {
     flex: 1;
     display: flex;
@@ -48,16 +48,14 @@ body {
     align-items: center;
     flex-direction: column;
     width: 100%;
-    gap: 0px;
 }
 
 .btn {
     width: 300px;
     height: 60px;
     background-color: #30D5C8;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: block;
+    margin: 20px auto 0; 
     font-weight: bold;
     cursor: pointer;
 }
