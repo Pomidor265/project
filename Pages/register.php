@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 if (empty($_SESSION["csrf_token"])) {
     $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
     }
@@ -11,7 +12,6 @@ if (empty($_SESSION["csrf_token"])) {
             die('csrf died');
     }
     }
-
 
 
 $host = '127.0.1.31';
@@ -34,26 +34,28 @@ if (isset($_POST['ok_btn'])) {
     $password = $_POST['password'];
 
 
-    if (empty($surname) || empty($name) || empty($mail) || empty($password)) {
+     if (empty($surname) || empty($name) || empty($mail) || empty($password)) {
         echo "Заполните обязательные поля!";
     } else {
-
-        $query = "SELECT * FROM User WHERE User_email = '$mail'";
-        $result = mysqli_query($conn, $query);
+        $checkQuery = "SELECT * FROM User WHERE User_email = ?";
+        $checkStmt = mysqli_prepare($conn, $checkQuery);
+        mysqli_stmt_bind_param($checkStmt, "s", $mail);
+        mysqli_stmt_execute($checkStmt);
+        $result = mysqli_stmt_get_result($checkStmt);
 
         if (mysqli_num_rows($result) > 0) {
             echo "Пользователь уже существует!";
         } else {
-
-          
             $insertQuery = "INSERT INTO User 
             (User_surname, User_name, User_patronymic, User_phone, User_email, User_birthday, User_password) 
-            VALUES 
-            ('$surname', '$name', '$patronymic', '$phone', '$mail', '$birthday', '$password')";
-
-            if (mysqli_query($conn, $insertQuery)) {
+            VALUES (?, ?, ?, ?, ?, ?, ?)";
+            
+            $stmt = mysqli_prepare($conn, $insertQuery);
+            mysqli_stmt_bind_param($stmt, "sssssss", $surname, $name, $patronymic, $phone, $mail, $birthday, $password);
+            
+            if (mysqli_stmt_execute($stmt)) {
                 header('Location: main.php');
-                echo "Регистрация успешна!";
+                exit();
             } else {
                 echo "Ошибка: " . mysqli_error($conn);
             }
@@ -80,47 +82,48 @@ if (isset($_POST['ok_btn'])) {
     <my-header-log></my-header-log>
     <div class="page">
     <form method="POST">
+    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'];?>">
     <div class="form-wrapper">
         
         <div class="fields">
             <div class="field">
                 <div class="label-box">Фамилия</div>
-                <input type="text" name="surname" required>
+                <input type="text" name="surname" required id="userInput">
             </div>
 
             <div class="field">
                 <div class="label-box">Имя</div>
-                <input type="text" name="name" required>
+                <input type="text" name="name" required id="userInput">
             </div>
 
             <div class="field">
                 <div class="label-box">Отчество</div>
-                <input type="text" name="patronymic">
+                <input type="text" name="patronymic" id="userInput">
             </div>
 
             <div class="field">
                 <div class="label-box">Телефон</div>
-                <input type="tel" name="phone">
+                <input type="tel" name="phone" id="userInput">
             </div>
 
             <div class="field">
                 <div class="label-box">Почта</div>
-                <input type="email" name="mail" required>
+                <input type="email" name="mail" required id="userInput">
             </div>
 
             <div class="field">
                 <div class="label-box">Дата рождения</div>
-                <input type="date" name="birthday">
+                <input type="date" name="birthday" id="userInput">
             </div>
 
             <div class="field">
                 <div class="label-box">Пароль</div>
-                <input type="password" name="password" required>
+                <input type="password" name="password" required id="userInput">
             </div>
         </div>
 
         <div class="container1">
-            <input type="submit" name="ok_btn" value="Зарегистрироваться" class="btn">
+            <input type="submit" name="ok_btn" value="Зарегистрироваться" class="btn" onclick="handleInput()">
             <p>Уже есть аккаунт?</p>
             <button type="button" onclick="window.location.href='login.php'" class="btn">Войти</button>
         </div>

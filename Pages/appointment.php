@@ -1,5 +1,16 @@
 <?php
 session_start();
+if (empty($_SESSION["csrf_token"])) {
+    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+    }
+
+    $token = $_SESSION["csrf_token"];
+
+    if (($_SERVER["REQUEST_METHOD"])=== 'POST'){
+        if (!isset( $_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            die('csrf died');
+    }
+    }
 
 $host = '127.0.1.31';
 $port = 3306;
@@ -23,7 +34,7 @@ $doctorsQuery = "
     FROM Doctor d
     JOIN DoctorType dt ON d.Doctor_type_id = dt.doctor_type_id
 ";
-$doctorsResult = mysqli_query($conn, $doctorsQuery);
+$doctorsResult = mysqli_query($conn, $doctorsQuery); 
 
 
 
@@ -34,28 +45,28 @@ if (isset($_POST['app_btn'])) {
     $fio = mysqli_real_escape_string($conn, $_POST['fio']);
     $doctor_id = (int)$_POST['doctor_id'];
 
-    $doctorQuery = "
-        SELECT Doctor_type_id, Hospital_id 
-        FROM doctor 
-        WHERE Doctor_id = $doctor_id
-    ";
-    $doctorResult = mysqli_query($conn, $doctorQuery);
+    $doctorQuery = "SELECT Doctor_type_id, Hospital_id FROM doctor WHERE Doctor_id = ?";
+    $doctorStmt = mysqli_prepare($conn, $doctorQuery);
+    mysqli_stmt_bind_param($doctorStmt, "i", $doctor_id);
+    mysqli_stmt_execute($doctorStmt);
+    $doctorResult = mysqli_stmt_get_result($doctorStmt);
     $doctorData = mysqli_fetch_assoc($doctorResult);
+
 
     $doctor_type_id = $doctorData['Doctor_type_id'];
     $hospital_id = $doctorData['Hospital_id'];
 
-   $query = "INSERT INTO appointment 
-    (Region, doctor_id, doctor_type, User_id, FIO, hospital_id, address, Appointment_date)
-    VALUES 
-    ('$region', '$doctor_id', '$doctor_type_id', '$user_id', '$fio', '$hospital_id', '$address', NOW())";
-
-   if (mysqli_query($conn, $query)) {
-    header("Location: main.php");
-    exit;
-}
-
-
+    $query = "INSERT INTO appointment 
+        (Region, doctor_id, doctor_type, User_id, FIO, hospital_id, address, Appointment_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+    
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "siiisss", $region, $doctor_id, $doctor_type_id, $user_id, $fio, $hospital_id, $address);
+    
+    if (mysqli_stmt_execute($stmt)) {
+        header("Location: main.php");
+        exit;
+    }
 }
 ?>
 
@@ -80,25 +91,25 @@ if (isset($_POST['app_btn'])) {
 <div class="page">
 
     <form method="POST">
-
+    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'];?>">
         <div class="field">
             <div class="label-box">Регион</div>
-            <input type="text" name="region" required>
+            <input type="text" name="region" required id="userInput">
         </div>
 
         <div class="field">
             <div class="label-box">Адрес</div>
-            <input type="text" name="address" required>
+            <input type="text" name="address" required id="userInput">
         </div>
 
         <div class="field">
             <div class="label-box">Телефон</div>
-            <input type="text" name="phone" required>
+            <input type="text" name="phone" required id="userInput">
         </div>
 
         <div class="field">
             <div class="label-box">ФИО</div>
-            <input type="text" name="fio" required>
+            <input type="text" name="fio" required id="userInput">
         </div>
 
         <div class="field">
@@ -113,8 +124,7 @@ if (isset($_POST['app_btn'])) {
                 <?php endwhile; ?>
             </select>
         </div>
-
-        <input type="submit" name="app_btn" value="Записаться" class="btn">
+        <input type="submit" name="app_btn" value="Записаться" class="btn" onclick="handleInput()">
 
     </form>
 

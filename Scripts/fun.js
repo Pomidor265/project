@@ -1,9 +1,5 @@
 function sanitize(str){
-    const map ={
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
+    const map ={'&': '&amp;','<': '&lt;','>': '&gt;', '"': '&quot;',
         "'": '&#x27;',
         "/": '&#x2F',
     };

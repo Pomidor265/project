@@ -13,9 +13,7 @@ $query = "SELECT * FROM Disease";
 $result = mysqli_query($conn, $query);
 $dis = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-
 $selected = $_GET['disease'] ?? null;
-
 
 $category_map = [
     1 => 'Легкие заболевания',
@@ -76,7 +74,7 @@ if ($selected) {
                 <?= ($selected == $d['Disease_id']) ? 'selected' : '' ?>>
                 <?= $d['Disease_name'] ?>
             </option>
-                 <?php endforeach; ?>
+                <?php endforeach; ?>
                 <?php endif; ?>
                 </select>
                 <br><br>
@@ -85,9 +83,9 @@ if ($selected) {
 
         <?php if (isset($_SESSION["auth"]) && $_SESSION["auth"] === true): ?>
         <div class="container">
-        <button class="btn" onclick="window.location.href='appointment.php'">
+            <button class="btn" onclick="window.location.href='appointment.php'">
             Записаться к врачу
-        </button>
+            </button>
         </div>
         <?php endif; ?>
     </div>

@@ -7,7 +7,8 @@
     $token = $_SESSION["csrf_token"];
 
     if (($_SERVER["REQUEST_METHOD"])=== 'POST'){
-        if (!isset( $_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        if (!isset( $_POST['csrf_token']) || 
+        $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
             die('csrf died');
     }
     }
@@ -25,9 +26,12 @@
     $a = $_POST['phone'];
     $b = $_POST['password']; 
 
-    $query = "SELECT * FROM `User` WHERE `User_phone`='$a' AND `User_password`='$b'";
-    $result = mysqli_query($conn, $query);
-    $qwe = mysqli_fetch_array($result); 
+    $query = "SELECT * FROM `User` WHERE `User_phone` = ? AND `User_password` = ?";
+    $stmt = mysqli_prepare($conn, $query);
+    mysqli_stmt_bind_param($stmt, "ss", $_POST['phone'], $_POST['password']);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $qwe = mysqli_fetch_array($result);
 
     if ($qwe) {
         $_SESSION['user_phone'] = $qwe['User_phone'];
@@ -36,7 +40,7 @@
         header('Location: main.php');
         exit();
         } 
-        else {echo "-";}
+        else {echo "Такого пользователя не существует";}
     }
         
         
@@ -68,30 +72,21 @@
     <my-header-log></my-header-log>
 
     <div class="page">
-
-        <?php if(isset($_SESSION["auth"]) && $_SESSION["auth"] === true): ?>
-            <form method="GET">
-                <div class="container">
-                    <p><input type="submit" name="exit_btn" value="выйти"></p>
-                </div>
-            </form>
-        <?php endif;?>
-
         <?php if(!isset($_SESSION["auth"]) || $_SESSION["auth"] !== true): ?>
             <form method="POST">
                 <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'];?>">
 
                 <div class="field">
                     <div class="label-box">Телефон</div>
-                    <input type="tel" name="phone">
+                    <input type="tel" name="phone" id="userInput">
                 </div>
 
                 <div class="field">
                     <div class="label-box">Пароль</div>
-                    <input type="password" name="password" required>
+                    <input type="password" name="password" required  id="userInput">
                 </div>
 
-                    <input type="submit" value="Войти" class="btn">
+                    <input type="submit" value="Войти" class="btn" onclick="handleInput()">
                 </div>
             </form>
         <?php endif;?>

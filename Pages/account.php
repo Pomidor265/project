@@ -1,16 +1,24 @@
 <?php
 session_start();
+if (empty($_SESSION["csrf_token"])) {
+    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+    }
 
-if (isset($_GET["exit_btn"])) {
+    $token = $_SESSION["csrf_token"];
+
+    if (($_SERVER["REQUEST_METHOD"])=== 'POST'){
+        if (!isset( $_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            die('csrf died');
+    }
+    }
+
+if (isset($_POST["exit_btn"])) {
         session_destroy();
         header('Location: main.php');
         exit();
     }
 
-if (isset($_GET["back_btn"])) {
-        header('Location: main.php');
-        exit();
-    }
+
 
 $host = '127.0.1.31';
 $port = 3306;
@@ -23,12 +31,30 @@ $conn = mysqli_connect($host, $user, $password, $database, $port);
 
 $user_id = $_SESSION['user_id'];
 
-$query = "SELECT * FROM `User` WHERE `User_id` = '$user_id'";
-$result = mysqli_query($conn, $query);
+$query = "SELECT * FROM `User` WHERE `User_id` = ?";
+$stmt = mysqli_prepare($conn, $query);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
 $user = mysqli_fetch_assoc($result);
 
 $gender = $user['User_gender'] ?? 'Не указан';
+
+if (isset($_POST["back_btn"])) {
+    $new_gender = $_POST['gender'] ?? null;
+
+    if (empty($gender) || $gender == 'Не указан') {
+
+        $updateQuery = "UPDATE `User` SET `User_gender` = ? WHERE `User_id` = ?";
+        $stmt = mysqli_prepare($conn, $updateQuery);
+        mysqli_stmt_bind_param($stmt, "si", $new_gender, $user_id);
+        mysqli_stmt_execute($stmt);
+    }
+
+    header('Location: main.php');
+    exit();
+}
 
 
 $birthDate = new DateTime($user['User_birthday']); 
@@ -42,15 +68,20 @@ $appointmentsQuery = "
         a.appointment_date,
         d.Doctor_surname,
         d.Doctor_name,
-        d.Doctor_patronymic
+        d.Doctor_patronymic,
+        dt.Type_name
     FROM appointment a
     LEFT JOIN Doctor d ON a.doctor_id = d.Doctor_id
-    WHERE a.user_id = '$user_id'
+    LEFT JOIN DoctorType dt ON d.Doctor_type_id = dt.Doctor_type_id
+    WHERE a.user_id = ?
     ORDER BY a.appointment_date DESC
     LIMIT 5
 ";
 
-$appointmentsResult = mysqli_query($conn, $appointmentsQuery);
+$stmt = mysqli_prepare($conn, $appointmentsQuery);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$appointmentsResult = mysqli_stmt_get_result($stmt);
 
 ?>
 
@@ -78,7 +109,18 @@ $appointmentsResult = mysqli_query($conn, $appointmentsQuery);
         ?>
         </div>
         <div class="box">
-            Пол: <?= htmlspecialchars($gender) ?>
+        Пол:
+        <?php if (empty($gender) || $gender == 'Не указан'): ?>
+        
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'];?>">
+            <select name="gender">
+                <option value="Мужской">Мужской</option>
+                <option value="Женский">Женский</option>
+            </select>
+        <?php else: ?>
+            <?= $gender ?>
+        <?php endif; ?>
         </div>
 
         <div class="box">
@@ -92,7 +134,7 @@ $appointmentsResult = mysqli_query($conn, $appointmentsQuery);
     <?php while ($row = mysqli_fetch_assoc($appointmentsResult)): ?>
         <div style="font-weight: normal; margin-top: 5px;">
             <?= $row['appointment_date'] ?> — 
-            <?= $row['Doctor_surname'] . ' ' . $row['Doctor_name'] . ' ' . $row['Doctor_patronymic'] ?>
+            <?= $row['Doctor_surname'] . ' ' . $row['Doctor_name'] . ' ' . $row['Doctor_patronymic'] . ' ' . $row['Type_name'] ?>
         </div>
     <?php endwhile; ?>
 <?php else: ?>
@@ -102,9 +144,10 @@ $appointmentsResult = mysqli_query($conn, $appointmentsQuery);
 <?php endif; ?>
 </div>
      
-        <form method="GET">
-        <input type="submit" name="back_btn" value="Назад", class="btn">
-        <input type="submit" name="exit_btn" value="Выход", class="btn">
+        <form method="POST">
+        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'];?>">
+        <input type="submit" name="back_btn" value="Назад", class="btn" formmethod="POST">
+        <input type="submit" name="exit_btn" value="Выход" class="btn" >
         </form>
     </div>   
-    </body>
+    </body> 

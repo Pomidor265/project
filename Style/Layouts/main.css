@@ -63,8 +63,8 @@ body{
 
 
 .card {
-    width: 800px;       
-    height: 500px;  
+    width: 1000px;       
+    height: 700px;  
     background: #68F5FF;
     padding: 25px;
     border-radius: 12px;
@@ -73,7 +73,7 @@ body{
 }
 
 .cont select {
-    width: 300px;
+    width: 500px;
     height: 50px;
     background-color: #93FBFF;
     border: none;
@@ -88,6 +88,6 @@ body{
 }
 
 .cont select option {
-    background: white;
+    background:#bffcff;;
     color: black;
 }
